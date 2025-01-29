@@ -1,17 +1,9 @@
-<script>
-export default {
-  data() {
-    return {
-      header: "Header",
-      content: "Content"
-    }
-  }
-};
+<script setup>
+import { ref } from 'vue';
+import Calculator from './components/Calculator.vue';
+
 </script>
 
 <template>
-  <div id="app">
-    <h1>{{ header }}</h1>
-    <p>{{ content }}</p>
-  </div>
+  <Calculator></Calculator>
 </template>
