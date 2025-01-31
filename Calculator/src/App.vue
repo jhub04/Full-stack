@@ -1,9 +1,9 @@
 <script setup>
 import { ref } from 'vue';
-import Calculator from './components/Calculator.vue';
+import CalculatorView from './views/CalculatorView.vue';
 
 </script>
 
 <template>
-  <Calculator></Calculator>
+  <CalculatorView></CalculatorView>
 </template>
