@@ -25,9 +25,9 @@
         <button class="action equals" @click="calculateResult">=</button>
       </div>
     </div>
-  </div>
 
-  <History :history="calculationHistory"></History>
+    <History :history="calculationHistory"></History>
+  </div>
 </template>
 
 <script setup>
@@ -91,7 +91,10 @@ const calculateResult = () => {
   }
 
   //Add to history
-  calculationHistory.value.push(`${num1} ${operator.value} ${num2} = ${result}`)
+  if (calculationHistory.value.length >= 7) {
+    calculationHistory.value.pop();
+  }
+  calculationHistory.value.unshift(`${num1} ${operator.value} ${num2} = ${result}`);
 
   currentValue.value = result !== null ? result.toString() : "";
   previousValue.value = null;
