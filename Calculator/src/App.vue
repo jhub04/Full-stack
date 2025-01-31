@@ -5,5 +5,22 @@ import CalculatorView from './views/CalculatorView.vue';
 </script>
 
 <template>
-  <CalculatorView></CalculatorView>
+  <div>
+    <nav>
+      <router-link to="/">Calculator</router-link>
+      <router-link to="/contactform">Contact Form</router-link>
+    </nav>
+    <router-view></router-view>
+  </div>
 </template>
+
+<style>
+nav {
+  margin-bottom: 20px;
+}
+nav a {
+  margin-right: 10px;
+  text-decoration: none;
+  color: black;
+}
+</style>
