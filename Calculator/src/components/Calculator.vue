@@ -1,87 +1,102 @@
 <template>
-    <div class="calculator">
-        <div class="calculator-container">
-            <div class="screen">
-                <input type="text" v-model="currentValue" disabled>
-            </div>
-            <div class="buttons">
-                <button v-for="number in numbers" :key="number" @click="appendNumber(number)">{{ number }}</button>
-                <button v-for="operator in operators" :key="operator" @click="appendOperator(operator)"> {{ operator }}</button>
+  <div class="calculator">
+    <div class="calculator-container">
+      <div class="screen">
+        <input type="text" v-model="currentValue" disabled />
+      </div>
+      <div class="buttons">
+        <button
+          v-for="number in numbers"
+          :key="number"
+          @click="appendNumber(number)"
+        >
+          {{ number }}
+        </button>
+        <button
+          v-for="operator in operators"
+          :key="operator"
+          @click="appendOperator(operator)"
+        >
+          {{ operator }}
+        </button>
 
-                <button class="action" @click="clearAll">C</button>
-                <button class="action" @click="deleteLast">DEL</button>
-                <button class="action equals" @click="calculateResult">=</button>
-            </div>
-
-        </div>
+        <button class="action" @click="clearAll">C</button>
+        <button class="action" @click="deleteLast">DEL</button>
+        <button class="action equals" @click="calculateResult">=</button>
+      </div>
     </div>
+  </div>
+
+  <History :history="calculationHistory"></History>
 </template>
 
 <script setup>
-import { ref } from "vue"
+import { ref } from "vue";
+import History from "./History.vue";
 
 const currentValue = ref("");
 const previousValue = ref(null);
 const operator = ref(null);
+const calculationHistory = ref([]);
 
-const numbers = ["7", "8", "9", "4", "5", "6", "1", "2", "3", "0"]
-const operators = ["+", "-", "*", "/"]
+const numbers = ["7", "8", "9", "4", "5", "6", "1", "2", "3", "0"];
+const operators = ["+", "-", "*", "/"];
 
 const appendNumber = (number) => {
-    if (currentValue.value === "0") currentValue = "";
-    currentValue.value = number;
-}
+  if (currentValue.value === "0") currentValue = "";
+  currentValue.value = number;
+};
 
 const appendOperator = (op) => {
-    if (currentValue === "") return;
-    if (operator.value) calculateResult();
-    previousValue.value = currentValue.value;
-    currentValue.value = "";
-    operator.value = op;
-}
+  if (currentValue === "") return;
+  if (operator.value) calculateResult();
+  previousValue.value = currentValue.value;
+  currentValue.value = "";
+  operator.value = op;
+};
 
 const clearAll = () => {
-    previousValue.value = null;
-    currentValue.value = "";
-    operator.value = null;
-}
+  previousValue.value = null;
+  currentValue.value = "";
+  operator.value = null;
+};
 
 const deleteLast = () => {
-    currentValue.value = currentValue.value.slice(0, -1);
-}
+  currentValue.value = currentValue.value.slice(0, -1);
+};
 
 const calculateResult = () => {
-    if (!previousValue.value || !operator.value || !currentValue) return;
+  if (!previousValue.value || !operator.value || !currentValue) return;
 
-    const num1 = parseFloat(previousValue.value);
-    const num2 = parseFloat(currentValue.value);
-    let result = 0;
+  const num1 = parseFloat(previousValue.value);
+  const num2 = parseFloat(currentValue.value);
+  let result = 0;
 
-    switch (operator.value) {
-        case "+":
-            result = num1 + num2;
-            break;
-        case "-":
-            result = num1 - num2;
-            break;
-        case "*":
-            result = num1 * num2;
-            break;
-        case "/":
-            result = num1 / num2;
-            break;
-        default:
-            console.error("Invalid operator")
-            return;
-    }
+  switch (operator.value) {
+    case "+":
+      result = num1 + num2;
+      break;
+    case "-":
+      result = num1 - num2;
+      break;
+    case "*":
+      result = num1 * num2;
+      break;
+    case "/":
+      result = num1 / num2;
+      break;
+    default:
+      console.error("Invalid operator");
+      return;
+  }
 
-    currentValue.value = result !== null ? result.toString() : "";
-    previousValue.value = null;
-    operator.value = null;
-}
+  //Add to history
+  calculationHistory.value.push(`${num1} ${operator.value} ${num2} = ${result}`)
 
-
- 
+  currentValue.value = result !== null ? result.toString() : "";
+  previousValue.value = null;
+  operator.value = null;
+};
 </script>
 
 <style scoped>
