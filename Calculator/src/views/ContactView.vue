@@ -1,3 +1,7 @@
-<script setup></script>
+<script setup>
+import Contact from "../components/Contact.vue";
+</script>
 
-<template><h1>ContactForm</h1></template>
+<template>
+    <Contact></Contact>
+</template>
