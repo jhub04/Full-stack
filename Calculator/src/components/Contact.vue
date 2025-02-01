@@ -1,16 +1,23 @@
 <script setup>
 import { ref } from "vue";
+import { useStore } from "vuex";
 
+const store = useStore();
 
-const nameField = ref("");
-const emailField = ref("");
+const nameField = ref(store.state.name || '');
+const emailField = ref(store.state.email || '');
 const reviewField = ref("");
 
 
-const handle = () => {
+const handleSubmit = () => {
   console.log(nameField.value);
   console.log(emailField.value);
   console.log(reviewField.value);
+
+  store.commit('setName', nameField.value);
+  store.commit('setEmail', emailField.value);
+
+
 };
 </script>
 
