@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
@@ -8,6 +8,10 @@ const nameField = ref(store.state.name || '');
 const emailField = ref(store.state.email || '');
 const reviewField = ref("");
 
+
+const isValid = computed(() => {
+    return nameField.value && emailField.value && reviewField.value
+});
 
 const handleSubmit = () => {
   console.log(nameField.value);
@@ -28,6 +32,6 @@ const handleSubmit = () => {
       <p>Email: <input type="text" required v-model="emailField" /></p>
       <p>Review: <input type="text" required v-model="reviewField" /></p>
   
-      <button type="submit">Send form</button>
+      <button type="submit" :disabled="!isValid">Send form</button>
     </form>
   </template>
