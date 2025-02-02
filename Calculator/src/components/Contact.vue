@@ -14,9 +14,7 @@ const isValid = computed(() => {
 });
 
 const handleSubmit = () => {
-  console.log(nameField.value);
-  console.log(emailField.value);
-  console.log(reviewField.value);
+  
 
   store.commit('setName', nameField.value);
   store.commit('setEmail', emailField.value);
