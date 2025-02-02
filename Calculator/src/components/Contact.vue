@@ -2,6 +2,7 @@
 import { ref, computed } from "vue";
 import { useStore } from "vuex";
 import axios from "axios";
+import router from "../router";
 
 const store = useStore();
 
@@ -13,10 +14,12 @@ const isValid = computed(() => {
   return nameField.value && emailField.value && reviewField.value;
 });
 
-const handleSubmit = () => {
-    const submitResponse = axios.get("http://localhost:3000/form");
+const handleSubmit = async () => {
+  const submitResponse = await axios.get("http://localhost:3000/form");
 
-    alert("Response: " + submitResponse);
+  if (submitResponse.data.status = "true") {
+    router.push("/");
+  }
   store.commit("setName", nameField.value);
   store.commit("setEmail", emailField.value);
 };
