@@ -62,7 +62,15 @@ const clearAll = () => {
 };
 
 const deleteLast = () => {
-  currentValue.value = currentValue.value.slice(0, -1);
+  if (currentValue.value && !operator.value) {
+    currentValue.value = currentValue.value.slice(0, -1);
+  } else if (previousValue.value && operator.value && !currentValue.value) {
+    operator.value = null;
+    currentValue.value = previousValue.value;
+    previousValue.value = null;
+  } else if (previousValue.value && operator.value && currentValue.value) {
+    currentValue.value = "";
+  }
 };
 
 const calculateResult = () => {
