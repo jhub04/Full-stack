@@ -91,7 +91,7 @@ const calculateResult = () => {
       result = num1 * num2;
       break;
     case "/":
-      result = num1 / num2;
+      result = num2 !== 0 ? num1 / num2 : "Error";
       break;
     default:
       console.error("Invalid operator");
