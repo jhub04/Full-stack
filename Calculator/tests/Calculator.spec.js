@@ -1,5 +1,5 @@
 import { mount } from "@vue/test-utils";
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect} from "vitest";
 import Calculator from "../src/components/Calculator.vue";
 
 describe("Calculator.vue", () => {
