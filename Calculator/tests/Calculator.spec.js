@@ -1,77 +1,56 @@
-import { mount } from '@vue/test-utils';
-import { describe, it, expect, vi } from 'vitest';
-import Calculator from '../src/components/Calculator.vue';
+import { mount } from "@vue/test-utils";
+import { describe, it, expect, vi } from "vitest";
+import Calculator from "../src/components/Calculator.vue";
 
-describe('Calculator.vue', () => {
-    it('appends numbers to the current value', async () => {
-        const wrapper = mount(Calculator);
+describe("Calculator.vue", () => {
+  let wrapper;
 
-        const button1 = wrapper.findAll('button').find(button => button.text() === '1');
-        await button1.trigger('click');
-        expect(wrapper.vm.currentValue).toBe('1');
-    });
-    it('appends operator and performs calculation', async () => {
-        const wrapper = mount(Calculator);
+  beforeEach(() => {
+    wrapper = mount(Calculator);
+  });
 
-        const button1 = wrapper.findAll('button').find(button => button.text() === '1');
-        await button1.trigger('click');
-        const buttonPlus = wrapper.findAll('button').find(button => button.text() === '+');
-        await buttonPlus.trigger('click');
-        const button9 = wrapper.findAll('button').find(button => button.text() === '9');
-        await button9.trigger('click');
-        const buttonEquals = wrapper.findAll('button').find(button => button.text() === '=');
-        await buttonEquals.trigger('click');
+  const findButton = (text) =>
+    wrapper.findAll("button").find((button) => button.text() === text);
+  const clickButton = async (text) => {
+    const button = findButton(text);
+    if (button) await button.trigger("click");
+  };
 
-        expect(wrapper.vm.currentValue).toBe("10");
-    });
-    it('totally resets when C button is triggered', async () => {
-        const wrapper = mount(Calculator);
+  it("appends numbers to the current value", async () => {
+    await clickButton('1');
+    expect(wrapper.vm.currentValue).toBe('1');
+  });
+  it("appends operator and performs calculation", async () => {
+    await clickButton('1');
+    await clickButton('+');
+    await clickButton('9');
+    await clickButton('=');
+    expect(wrapper.vm.currentValue).toBe("10");
+  });
+  it("totally resets when C button is triggered", async () => {
+    await clickButton('7');
+    await clickButton('C');
 
-        const button1 = wrapper.findAll('button').find(button => button.text() === '1');
-        await button1.trigger('click');
-        const buttonPlus = wrapper.findAll('button').find(button => button.text() === '+');
-        await buttonPlus.trigger('click');
+    expect(wrapper.vm.currentValue).toBe("");
+    expect(wrapper.vm.operator).toBe(null);
+    expect(wrapper.vm.previousValue).toBe(null);
+  });
+  it("deletes last character when DEL button is triggered", async () => {
+    await clickButton('7');
+    await clickButton('+');
+    await clickButton('DEL')
 
-        expect(wrapper.vm.previousValue).toBe('1');
-        expect(wrapper.vm.currentValue).toBe('');
-        expect(wrapper.vm.operator).toBe("+");
+    expect(wrapper.vm.currentValue).toBe('7');
+    expect(wrapper.vm.previousValue).toBe(null);
+    expect(wrapper.vm.operator).toBe(null);
+  });
+  it("handles division by zero", async () => {
 
-        const buttonClear = wrapper.findAll('button').find(button => button.text() === 'C');
-        await buttonClear.trigger('click');
+    await clickButton('8');
+    await clickButton('/');
+    await clickButton('0');
+    await clickButton('=');
 
-        expect(wrapper.vm.currentValue).toBe("");
-        expect(wrapper.vm.operator).toBe(null);
-        expect(wrapper.vm.previousValue).toBe(null);
-
-    });
-    it('deletes last character when DEL button is triggered', async() => {
-        const wrapper = mount(Calculator);
-
-        const button1 = wrapper.findAll('button').find(button => button.text() === '1');
-        await button1.trigger('click');
-        const buttonPlus = wrapper.findAll('button').find(button => button.text() === '+');
-        await buttonPlus.trigger('click')
-
-        const buttonDEL = wrapper.findAll('button').find(button => button.text() === 'DEL');
-        await buttonDEL.trigger('click');
-
-        expect(wrapper.vm.currentValue).toBe('1');
-        expect(wrapper.vm.previousValue).toBe(null);
-        expect(wrapper.vm.operator).toBe(null);
-
-    });
-    it('handles division by zero', async () => {
-        const wrapper = mount(Calculator);
-    
-        const button8 = wrapper.findAll('button').find(button => button.text() === '8');
-        await button8.trigger('click');
-        const buttonDivide = wrapper.findAll('button').find(button => button.text() === '/');
-        await buttonDivide.trigger('click');
-        const button0 = wrapper.findAll('button').find(button => button.text() === '0');
-        await button0.trigger('click');
-        const buttonEquals = wrapper.findAll('button').find(button => button.text() === '=');
-        await buttonEquals.trigger('click');
-    
-        expect(wrapper.vm.currentValue).toBe('Error');
-      });
-})
+    expect(wrapper.vm.currentValue).toBe("Error");
+  });
+});

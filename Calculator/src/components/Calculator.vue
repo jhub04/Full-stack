@@ -43,12 +43,12 @@ const numbers = ["7", "8", "9", "4", "5", "6", "1", "2", "3", "0"];
 const operators = ["+", "-", "*", "/"];
 
 const appendNumber = (number) => {
-  if (currentValue.value === "0") currentValue = "";
+  if (currentValue.value === "0") currentValue.value = "";
   currentValue.value = number;
 };
 
 const appendOperator = (op) => {
-  if (currentValue === "") return;
+  if (currentValue.value === "") return;
   if (operator.value) calculateResult();
   previousValue.value = currentValue.value;
   currentValue.value = "";
