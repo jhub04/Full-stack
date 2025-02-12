@@ -33,6 +33,7 @@
 <script setup>
 import { ref } from "vue";
 import History from "./History.vue";
+import axios from "axios";
 
 const currentValue = ref("");
 const previousValue = ref(null);
@@ -73,38 +74,36 @@ const deleteLast = () => {
   }
 };
 
-const calculateResult = () => {
+const calculateResult = async () => {
   if (!previousValue.value || !operator.value || !currentValue) return;
 
   const num1 = parseFloat(previousValue.value);
   const num2 = parseFloat(currentValue.value);
-  let result = 0;
 
-  switch (operator.value) {
-    case "+":
-      result = num1 + num2;
-      break;
-    case "-":
-      result = num1 - num2;
-      break;
-    case "*":
-      result = num1 * num2;
-      break;
-    case "/":
-      result = num2 !== 0 ? num1 / num2 : "Error";
-      break;
-    default:
-      console.error("Invalid operator");
-      return;
+  try {
+    const response = await axios.post(
+      "http://localhost:8080/api/calculator/calculate",
+      {
+        num1: num1,
+        num2: num2,
+        operator: operator.value,
+      }
+    );
+    const result = response.data.result;
+
+    //Add to history
+    if (calculationHistory.value.length >= 7) {
+      calculationHistory.value.pop();
+    }
+    calculationHistory.value.unshift(
+      `${num1} ${operator.value} ${num2} = ${result}`
+    );
+    currentValue.value = result.toString();
+  } catch (error) {
+    console.log("Feil ved beregning");
+    currentValue.value = "Error";
   }
 
-  //Add to history
-  if (calculationHistory.value.length >= 7) {
-    calculationHistory.value.pop();
-  }
-  calculationHistory.value.unshift(`${num1} ${operator.value} ${num2} = ${result}`);
-
-  currentValue.value = result !== null ? result.toString() : "";
   previousValue.value = null;
   operator.value = null;
 };
