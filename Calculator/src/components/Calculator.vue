@@ -31,7 +31,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { nextTick, ref } from "vue";
 import History from "./History.vue";
 import axios from "axios";
 
@@ -90,6 +90,7 @@ const calculateResult = async () => {
       }
     );
     const result = response.data.result;
+
 
     //Add to history
     if (calculationHistory.value.length >= 7) {
