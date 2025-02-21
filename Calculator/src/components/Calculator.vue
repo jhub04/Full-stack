@@ -101,8 +101,13 @@ const calculateResult = async () => {
     );
     currentValue.value = result.toString();
   } catch (error) {
-    console.log("Feil ved beregning");
-    currentValue.value = "Error";
+    console.log("Error during calculations: ", error);
+
+    if (error.response && error.response.data) {
+      currentValue.value = error.response.data;
+    } else {
+      currentValue.value = "Unexpected error";
+    }
   }
 
   previousValue.value = null;
