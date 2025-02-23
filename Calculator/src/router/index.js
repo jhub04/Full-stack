@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory} from 'vue-router';
 import CalculatorView from '../views/CalculatorView.vue';
 import ContactView from '../views/ContactView.vue';
+import LoginView from '../views/LoginView.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -14,6 +15,11 @@ const router = createRouter({
             path: '/contactform',
             name: 'contactform',
             component: ContactView
+        },
+        {
+            path: '/login',
+            name: 'login',
+            component: LoginView
         }
     ]
 })

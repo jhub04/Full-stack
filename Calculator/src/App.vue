@@ -9,6 +9,7 @@ import CalculatorView from './views/CalculatorView.vue';
     <nav>
       <router-link to="/">Calculator</router-link>
       <router-link to="/contactform">Contact Form</router-link>
+      <router-link to="/login">Login</router-link>
     </nav>
     <router-view></router-view>
   </div>
