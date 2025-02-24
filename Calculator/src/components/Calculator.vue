@@ -82,7 +82,7 @@ const calculateResult = async () => {
 
   try {
     const response = await axios.post(
-      "http://localhost:8080/api/calculator/calculate",
+      "http://localhost:8080/calculator/calculate",
       {
         num1: num1,
         num2: num2,
