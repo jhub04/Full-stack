@@ -1,47 +1,78 @@
-<template>
-  <div class="calculator">
-    <div class="calculator-container">
-      <div class="screen">
-        <input type="text" v-model="currentValue" disabled />
-      </div>
-      <div class="buttons">
-        <button
-          v-for="number in numbers"
-          :key="number"
-          @click="appendNumber(number)"
-        >
-          {{ number }}
-        </button>
-        <button
-          v-for="operator in operators"
-          :key="operator"
-          @click="appendOperator(operator)"
-        >
-          {{ operator }}
-        </button>
-
-        <button class="action" @click="clearAll">C</button>
-        <button class="action" @click="deleteLast">DEL</button>
-        <button class="action equals" @click="calculateResult">=</button>
-      </div>
-    </div>
-
-    <History :history="calculationHistory"></History>
-  </div>
-</template>
-
 <script setup>
-import { nextTick, ref } from "vue";
-import History from "./History.vue";
+import { ref, computed } from "vue";
 import axios from "axios";
+import { useStore } from "vuex";
 
+const store = useStore();
 const currentValue = ref("");
 const previousValue = ref(null);
 const operator = ref(null);
-const calculationHistory = ref([]);
+const history= ref([]);
+const errorMessage = ref("");
+
+const currentUser = computed(() => store.getters.currentUser);
 
 const numbers = ["7", "8", "9", "4", "5", "6", "1", "2", "3", "0"];
 const operators = ["+", "-", "*", "/"];
+
+
+const saveCalculation = async(expression, result) => {
+  if (!currentUser.value) {
+    errorMessage.value = "You need to be logged in to save calculations!";
+    return;
+  }
+  console.log("User is recognized");
+
+  try {
+    const response = await axios.post("http://localhost:8080/calculator/calculate", {
+      userId: currentUser.value.id,
+      expression: expression,
+      result: result.toString(),
+    });
+    console.log(response);
+    console.log("POST request successfull");
+    //await fetchHistory();
+  } catch (error) {
+    errorMessage.value = "Failed to save calculation";
+    console.error("Error: ", error);
+  }
+  
+}
+
+const calculateResult = async() => {
+  let result;
+  const prev = parseFloat(previousValue.value);
+  const current = parseFloat(currentValue.value);
+
+  if (isNaN(prev) || isNaN(current)) return;
+
+  switch (operator.value) {
+    case '+':
+      result = prev + current;
+      break;
+    case '-':
+      result = prev - current;
+      break;
+    case '*':
+      result = prev * current;
+      break;
+    case '/':
+      result = prev / current;
+      break;
+    default:
+      return;
+  }
+
+  const expression = `${prev} ${operator.value} ${current}`;
+  console.log("Result is " + result);
+  await saveCalculation(expression, result);
+  console.log("saveCalculation method called");
+  
+  currentValue.value = result;
+  operator.value = null;
+  previousValue.value = null;
+
+}
 
 const appendNumber = (number) => {
   if (currentValue.value === "0") currentValue.value = "";
@@ -74,46 +105,38 @@ const deleteLast = () => {
   }
 };
 
-const calculateResult = async () => {
-  if (!previousValue.value || !operator.value || !currentValue) return;
-
-  const num1 = parseFloat(previousValue.value);
-  const num2 = parseFloat(currentValue.value);
-
-  try {
-    const response = await axios.post(
-      "http://localhost:8080/calculator/calculate",
-      {
-        num1: num1,
-        num2: num2,
-        operator: operator.value,
-      }
-    );
-    const result = response.data.result;
-
-
-    //Add to history
-    if (calculationHistory.value.length >= 7) {
-      calculationHistory.value.pop();
-    }
-    calculationHistory.value.unshift(
-      `${num1} ${operator.value} ${num2} = ${result}`
-    );
-    currentValue.value = result.toString();
-  } catch (error) {
-    console.log("Error during calculations: ", error);
-
-    if (error.response && error.response.data) {
-      currentValue.value = error.response.data;
-    } else {
-      currentValue.value = "Unexpected error";
-    }
-  }
-
-  previousValue.value = null;
-  operator.value = null;
-};
+  
 </script>
+
+<template>
+  <div class="calculator">
+    <div class="calculator-container">
+      <div class="screen">
+        <input type="text" v-model="currentValue" disabled />
+      </div>
+      <div class="buttons">
+        <button
+          v-for="number in numbers"
+          :key="number"
+          @click="appendNumber(number)"
+        >
+          {{ number }}
+        </button>
+        <button
+          v-for="operator in operators"
+          :key="operator"
+          @click="appendOperator(operator)"
+        >
+          {{ operator }}
+        </button>
+
+        <button class="action" @click="clearAll">C</button>
+        <button class="action" @click="deleteLast">DEL</button>
+        <button class="action equals" @click="calculateResult">=</button>
+      </div>
+    </div>
+  </div>
+</template>
 
 <style scoped>
 .calculator {

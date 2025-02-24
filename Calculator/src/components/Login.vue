@@ -1,7 +1,9 @@
 <script setup>
 import { ref } from "vue"
 import axios from "axios";
+import { useStore } from "vuex";
 
+const store = useStore();
 const username = ref("");
 const password = ref("");
 const isLoginMode = ref(true);
@@ -22,7 +24,10 @@ const handleSubmit = async () => {
         }); 
 
         if (isLoginMode.value) {
-            localStorage.setItem("user", JSON.stringify(response.data));
+            store.dispatch('login', {
+                id: response.data.id,
+                username: response.data.username
+            });
             console.log("Logged in:", response.data);
         } else {
             console.log("Registered successfully, please log in!");

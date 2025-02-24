@@ -2,25 +2,28 @@ import { createStore } from "vuex";
 
 const store = createStore({
     state: {
-        name: '',
-        email: ''
+        user: null // Will hold { id, username } when logged in
     },
     mutations: {
-        setName(state, name) {
-            state.name = name;
+        setUser(state, user) {
+            state.user = user;
         },
-        setEmail(state, email) {
-            state.email = email;
+        clearUser(state) {
+            state.user = null;
         }
     },
     actions: {
-        updateName({ commit }, name) {
-            commit('setName', name);
+        login({ commit }, user) {
+            commit('setUser', user);
         },
-        updateEmail({ commit }, email) {
-            commit('setEmail', email);
+        logout({ commit }) {
+            commit('clearUser');
         }
+    },
+    getters: {
+        currentUser: state => state.user,
+        isAuthenticated: state => !!state.user
     }
 });
 
-export default store
+export default store;
