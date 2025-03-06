@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import axios from "axios";
 import { useStore } from "vuex";
 
@@ -9,12 +9,37 @@ const previousValue = ref(null);
 const operator = ref(null);
 const history= ref([]);
 const errorMessage = ref("");
+const currentPage = ref(0);
+const pageSize = ref(10);
 
 const currentUser = computed(() => store.getters.currentUser);
 
 const numbers = ["7", "8", "9", "4", "5", "6", "1", "2", "3", "0"];
 const operators = ["+", "-", "*", "/"];
 
+const fetchHistory = async () => {
+  if (!currentUser.value) return;
+
+  try {
+    console.log("Fetching history for user ID:", currentUser.value.id);
+
+    const response = await axios.get('http://localhost:8080/calculator', {
+      params: {
+        userId: currentUser.value.id,
+        page: currentPage.value,
+        size: pageSize.value
+      }
+    });
+    console.log("API Response:", response.data);
+
+    history.value = response.data; 
+
+    console.log("Mapped history:", history.value);
+  } catch (error) {
+    errorMessage.value = "Failed to fetch history";
+    console.error("Error fetching history", error);
+  }
+};
 
 const saveCalculation = async(expression, result) => {
   if (!currentUser.value) {
@@ -31,7 +56,7 @@ const saveCalculation = async(expression, result) => {
     });
     console.log(response);
     console.log("POST request successfull");
-    //await fetchHistory();
+    await fetchHistory();
   } catch (error) {
     errorMessage.value = "Failed to save calculation";
     console.error("Error: ", error);
@@ -105,6 +130,21 @@ const deleteLast = () => {
   }
 };
 
+const nextPage = () => {
+  currentPage.value++;
+  fetchHistory();
+};
+
+const prevPage = () => {
+  currentPage.value = Math.max(0, currentPage.value - 1);
+  fetchHistory();
+};
+
+onMounted(() => {
+  if (currentUser.value) {
+    fetchHistory();
+  }
+})
   
 </script>
 
@@ -135,56 +175,92 @@ const deleteLast = () => {
         <button class="action equals" @click="calculateResult">=</button>
       </div>
     </div>
+
+    <div class="history" v-if="currentUser">
+      <h3>Calculation History</h3>
+      <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
+      
+      <div class="pagination-controls">
+        <button @click="prevPage" :disabled="currentPage === 0">Previous</button>
+        <span>Page {{ currentPage + 1 }}</span>
+        <button @click="nextPage">Next</button>
+      </div>
+
+      <ul>
+        <li v-for="(calc, index) in history" :key="index">
+          {{ calc.expression }} = {{ calc.result }} ({{ calc.createdAt }})
+        </li>
+      </ul>
+    </div>
+
+    <div v-else class="auth-warning">
+      Please log in to view and save calculation history
+    </div>
   </div>
+    
 </template>
 
 <style scoped>
 .calculator {
-  display: flex;
-  flex-direction: row;
-  gap: 250px;
-  max-width: 1200px;
-  margin: 50px auto;
-  text-align: center;
-  font-family: Arial, sans-serif;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
-.screen input {
-  width: 100%;
-  padding: 10px;
-  font-size: 24px;
+.display {
+  font-size: 2em;
+  padding: 20px;
+  background: #f0f0f0;
   text-align: right;
   margin-bottom: 10px;
+  border-radius: 5px;
 }
 
 .buttons {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 10px;
 }
 
 button {
   padding: 15px;
-  font-size: 18px;
-  border: none;
+  font-size: 1.2em;
+  border: 1px solid #ddd;
   border-radius: 5px;
+  background: #fff;
   cursor: pointer;
-  background-color: #f0f0f0;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 button:hover {
-  background-color: #dcdcdc;
+  background: #f0f0f0;
 }
 
-.action {
-  background-color: #ff6666;
-  color: white;
+.history {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
 }
 
-.equals {
-  background-color: #66cc66;
-  color: white;
-  grid-column: span 2;
+.history ul {
+  list-style: none;
+  padding: 0;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.history li {
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.error {
+  color: #ff4444;
+  margin-bottom: 10px;
+}
+
+.auth-warning {
+  color: #666;
+  margin-top: 20px;
+  text-align: center;
 }
 </style>
