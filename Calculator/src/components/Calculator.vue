@@ -30,11 +30,7 @@ const fetchHistory = async () => {
         size: pageSize.value
       }
     });
-    console.log("API Response:", response.data);
-
     history.value = response.data; 
-
-    console.log("Mapped history:", history.value);
   } catch (error) {
     errorMessage.value = "Failed to fetch history";
     console.error("Error fetching history", error);

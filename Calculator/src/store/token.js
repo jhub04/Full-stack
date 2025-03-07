@@ -7,6 +7,10 @@ export const useTokenStore = defineStore("token", {
       jwtToken: null,
       loggedInUser: null,
     }),
+    persist: {
+      storage: sessionStorage,
+    },
+  
   
     actions: {
       async getTokenAndSaveInStore(username, password) {
