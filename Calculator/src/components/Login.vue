@@ -15,11 +15,13 @@ const password = ref("");
 const loginStatus = ref("");
 
 async function handleLoginClick() {
-    await tokenStore.getTokenAndSaveInStore(username.value, password.value);
-    if (tokenStore.jwtToken) {
-        router.push("/");
-    } else {
-        loginStatus.value = "Login failed!";
+    try {
+        await tokenStore.getTokenAndSaveInStore(username.value, password.value);
+        if (tokenStore.jwtToken) {
+            router.push("/");
+        }
+    } catch (error) {
+        loginStatus.value = error.message;
     }
 }
 

@@ -14,16 +14,19 @@ export const useTokenStore = defineStore("token", {
   
     actions: {
       async getTokenAndSaveInStore(username, password) {
-          try{
-              let response = await getJwtToken(username, password);
-              let data = response.data;
-              if(data != null && data != '' && data != undefined){
-                  this.jwtToken = data;
-                  this.loggedInUser = username;
-              }
-          } catch (err){
-              console.log(err)
-          }
-      }
+        try {
+            let response = await getJwtToken(username, password);
+            let data = response.data;
+            if (data) {
+                this.jwtToken = data;
+                this.loggedInUser = username;
+            }
+        } catch (err) {
+            if (err.response && err.response.status === 401) {
+                throw new Error("Invalid username or password");
+            }
+            throw new Error("An unexpected error occurred");
+        }
+    }
     },
   });
