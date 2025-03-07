@@ -19,7 +19,7 @@ async function handleLoginClick() {
     if (tokenStore.jwtToken) {
         router.push("/");
     } else {
-        this.loginStatus = "Login failed!";
+        loginStatus.value = "Login failed!";
     }
 }
 
@@ -30,16 +30,20 @@ async function handleLoginClick() {
 <template>
     <div id="loginWrapper">
         <h1 class="loginElement">Login</h1>
-        <p v-if="loginStatus">{{ loginStatus }}</p>
         <h3 class="loginElement">Username</h3>
         <input class="loginElement" v-model="username">
         <h3 class="loginElement">Password</h3>
         <input class="loginElement" v-model="password">
         <button class="loginElement" @click="handleLoginClick" id="loginButton">Login</button>
     </div>
+    <p v-if="loginStatus" id="loginstatus">{{ loginStatus }}</p>
     </template>
 
 <style scoped>
+#loginstatus {
+    color: red;
+}
+
 #loginWrapper {
     display: grid;
     grid-template-columns: repeat(2, 1fr);

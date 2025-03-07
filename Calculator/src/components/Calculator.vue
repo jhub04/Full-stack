@@ -145,7 +145,7 @@ onMounted(async () => {
     console.log("Unauthenticated context");
   } else {
     console.log("Authenticated context!");
-    let response = await getUserInfo("jonathan", tokenStore.jwtToken);
+    let response = await getUserInfo(tokenStore.loggedInUser, tokenStore.jwtToken);
     currentUser.value = response.data;
     fetchHistory();
   }
