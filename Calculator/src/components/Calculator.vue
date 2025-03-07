@@ -1,9 +1,10 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import axios from "axios";
-import { useStore } from "vuex";
+import { useTokenStore } from "@/store/token";
+import { getUserInfo } from "@/utils/httputils";
 
-const store = useStore();
+const tokenStore = useTokenStore();
 const currentValue = ref("");
 const previousValue = ref(null);
 const operator = ref(null);
@@ -11,8 +12,7 @@ const history= ref([]);
 const errorMessage = ref("");
 const currentPage = ref(0);
 const pageSize = ref(10);
-
-const currentUser = computed(() => store.getters.currentUser);
+const currentUser = ref(null);
 
 const numbers = ["7", "8", "9", "4", "5", "6", "1", "2", "3", "0"];
 const operators = ["+", "-", "*", "/"];
@@ -21,11 +21,11 @@ const fetchHistory = async () => {
   if (!currentUser.value) return;
 
   try {
-    console.log("Fetching history for user ID:", currentUser.value.id);
+    console.log("Fetching history for username:", currentUser.value);
 
     const response = await axios.get('http://localhost:8080/calculator', {
       params: {
-        userId: currentUser.value.id,
+        userName: currentUser.value,
         page: currentPage.value,
         size: pageSize.value
       }
@@ -50,7 +50,7 @@ const saveCalculation = async(expression, result) => {
 
   try {
     const response = await axios.post("http://localhost:8080/calculator/calculate", {
-      userId: currentUser.value.id,
+      userName: currentUser.value,
       expression: expression,
       result: result.toString(),
     });
@@ -140,11 +140,16 @@ const prevPage = () => {
   fetchHistory();
 };
 
-onMounted(() => {
-  if (currentUser.value) {
+onMounted(async () => {
+  if (!tokenStore.jwtToken) {
+    console.log("Unauthenticated context");
+  } else {
+    console.log("Authenticated context!");
+    let response = await getUserInfo("jonathan", tokenStore.jwtToken);
+    currentUser.value = response.data;
     fetchHistory();
   }
-})
+});
   
 </script>
 
