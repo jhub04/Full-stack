@@ -1,6 +1,6 @@
 import axios from "axios";
 import { defineStore } from "pinia";
-import {getJwtToken} from "../utils/httputils.js"
+import {getJwtToken, getUserInfo} from "../utils/httputils.js"
 
 export const useTokenStore = defineStore("token", {
     state: () => ({
@@ -15,7 +15,8 @@ export const useTokenStore = defineStore("token", {
               let data = response.data;
               if(data != null && data != '' && data != undefined){
                   this.jwtToken = data;
-                  this.loggedInUser = user
+                  let userResponse = await getUserInfo(username, data.token)
+                  this.loggedInUser = userResponse.data;
               }
           } catch (err){
               console.log(err)
