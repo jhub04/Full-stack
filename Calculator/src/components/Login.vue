@@ -35,7 +35,7 @@ async function handleLoginClick() {
         <h3 class="loginElement">Username</h3>
         <input class="loginElement" v-model="username">
         <h3 class="loginElement">Password</h3>
-        <input class="loginElement" v-model="password">
+        <input type="password" class="loginElement" v-model="password">
         <button class="loginElement" @click="handleLoginClick" id="loginButton">Login</button>
     </div>
     <p v-if="loginStatus" id="loginstatus">{{ loginStatus }}</p>
