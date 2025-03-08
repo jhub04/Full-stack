@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory} from 'vue-router';
 import CalculatorView from '../views/CalculatorView.vue';
-import ContactView from '../views/ContactView.vue';
 import LoginView from '../views/LoginView.vue';
 
 const router = createRouter({
@@ -10,11 +9,6 @@ const router = createRouter({
             path: '/',
             name: 'home',
             component: CalculatorView
-        },
-        {
-            path: '/contactform',
-            name: 'contactform',
-            component: ContactView
         },
         {
             path: '/login',

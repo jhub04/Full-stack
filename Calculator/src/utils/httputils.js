@@ -1,10 +1,11 @@
 import axios from "axios"
 
 // Takes username and password as parameters, sends http post request to server, and in response gets a JWT token from the server
-export const getJwtToken = (username, password) => {
+export const getJwtToken = (username, password, token) => {
     const config = {
         headers: {
             "Content-type": "application/json",
+            "Authorization" : "Bearer " + token
         },
     };
     return axios.post("http://localhost:8080/token", JSON.stringify({ username, password }), config);

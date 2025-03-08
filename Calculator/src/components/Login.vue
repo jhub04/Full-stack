@@ -16,12 +16,12 @@ const loginStatus = ref("");
 
 async function handleLoginClick() {
     try {
-        await tokenStore.getTokenAndSaveInStore(username.value, password.value);
+        await tokenStore.getTokenAndSaveInStore(username.value, password.value, tokenStore.jwtToken);
         if (tokenStore.jwtToken) {
             router.push("/");
         }
     } catch (error) {
-        loginStatus.value = error.message;
+        loginStatus.value = "Credentials are invalid";
     }
 }
 

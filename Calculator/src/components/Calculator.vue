@@ -28,6 +28,9 @@ const fetchHistory = async () => {
         userName: currentUser.value,
         page: currentPage.value,
         size: pageSize.value
+      },
+      headers: {
+        "Authorization": "Bearer " + tokenStore.jwtToken
       }
     });
     history.value = response.data; 
@@ -49,6 +52,11 @@ const saveCalculation = async(expression, result) => {
       userName: currentUser.value,
       expression: expression,
       result: result.toString(),
+    },
+    {
+      headers: {
+        "Authorization": "Bearer " + tokenStore.jwtToken
+      }
     });
     console.log(response);
     console.log("POST request successfull");
