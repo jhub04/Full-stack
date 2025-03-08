@@ -40,7 +40,7 @@ const fetchHistory = async () => {
   }
 };
 
-const saveCalculation = async(expression, result) => {
+const saveCalculation = async(expression) => {
   if (!currentUser.value) {
     errorMessage.value = "You need to be logged in to save calculations!";
     return;
@@ -51,7 +51,6 @@ const saveCalculation = async(expression, result) => {
     const response = await axios.post("http://localhost:8080/calculator/calculate", {
       userName: currentUser.value,
       expression: expression,
-      result: result.toString(),
     },
     {
       headers: {
@@ -68,40 +67,40 @@ const saveCalculation = async(expression, result) => {
   
 }
 
-const calculateResult = async() => {
-  let result;
+const calculateResult = async () => {
   const prev = parseFloat(previousValue.value);
   const current = parseFloat(currentValue.value);
+  const operation = operator.value;
 
-  if (isNaN(prev) || isNaN(current)) return;
+  if (isNaN(prev) || isNaN(current) || !operation) return;
 
-  switch (operator.value) {
-    case '+':
-      result = prev + current;
-      break;
-    case '-':
-      result = prev - current;
-      break;
-    case '*':
-      result = prev * current;
-      break;
-    case '/':
-      result = prev / current;
-      break;
-    default:
-      return;
+  const expression = `${prev} ${operation} ${current}`;
+
+
+  try {
+    const response = await axios.post("http://localhost:8080/calculator/calculate", 
+    {
+      userName: currentUser.value,
+      expression: expression
+    },
+    {
+      headers: {
+        "Authorization": "Bearer " + tokenStore.jwtToken
+      }
+    });
+
+    currentValue.value = response.data.result;
+    saveCalculation(expression);
+    errorMessage.value = "";
+  } catch (error) {
+    errorMessage.value = "Calculation failed!";
+    console.log("Error: ", error);
   }
 
-  const expression = `${prev} ${operator.value} ${current}`;
-  console.log("Result is " + result);
-  await saveCalculation(expression, result);
-  console.log("saveCalculation method called");
-  
-  currentValue.value = result;
   operator.value = null;
   previousValue.value = null;
+};
 
-}
 
 const appendNumber = (number) => {
   if (currentValue.value === "0") currentValue.value = "";
