@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import axios from "axios";
 import { useTokenStore } from "@/store/token";
 import { getUserInfo } from "@/utils/httputils";
@@ -40,33 +40,6 @@ const fetchHistory = async () => {
   }
 };
 
-const saveCalculation = async(expression) => {
-  if (!currentUser.value) {
-    errorMessage.value = "You need to be logged in to save calculations!";
-    return;
-  }
-  console.log("User is recognized");
-
-  try {
-    const response = await axios.post("http://localhost:8080/calculator/calculate", {
-      userName: currentUser.value,
-      expression: expression,
-    },
-    {
-      headers: {
-        "Authorization": "Bearer " + tokenStore.jwtToken
-      }
-    });
-    console.log(response);
-    console.log("POST request successfull");
-    await fetchHistory();
-  } catch (error) {
-    errorMessage.value = "Failed to save calculation";
-    console.error("Error: ", error);
-  }
-  
-}
-
 const calculateResult = async () => {
   const prev = parseFloat(previousValue.value);
   const current = parseFloat(currentValue.value);
@@ -90,7 +63,7 @@ const calculateResult = async () => {
     });
 
     currentValue.value = response.data.result;
-    saveCalculation(expression);
+    fetchHistory();
     errorMessage.value = "";
   } catch (error) {
     errorMessage.value = "Calculation failed!";
@@ -109,7 +82,7 @@ const appendNumber = (number) => {
 
 const appendOperator = (op) => {
   if (currentValue.value === "") return;
-  if (operator.value) calculateResult();
+  ///if (operator.value) calculateResult();
   previousValue.value = currentValue.value;
   currentValue.value = "";
   operator.value = op;
